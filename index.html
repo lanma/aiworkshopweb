@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 痛點解決實戰工作坊 - 參加者篩選問卷</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Custom Font Import - Noto Sans TC */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f5f5f4; /* Stone 100 */
+        }
+
+        .chart-container {
+            position: relative; 
+            width: 100%; 
+            max-width: 600px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            height: 300px; 
+            max-height: 400px; 
+        }
+        
+        @media (min-width: 768px) { 
+            .chart-container { 
+                height: 350px; 
+            } 
+        }
+
+        /* Smooth transitions */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-focus:focus {
+            outline: none;
+            border-color: #d97706; /* Amber 600 */
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
+        }
+    </style>
+</head>
+<body class="text-stone-800">
+
+    <!-- Navigation / Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <i class="fa-solid fa-brain text-amber-600 text-2xl mr-3"></i>
+                    <span class="font-bold text-xl tracking-tight text-stone-900">AI 痛點實戰實驗室</span>
+                </div>
+                <nav class="hidden md:flex space-x-8">
+                    <button onclick="navigateTo('home')" class="nav-btn text-stone-500 hover:text-amber-600 font-medium transition" id="nav-home">計畫說明</button>
+                    <button onclick="navigateTo('analysis')" class="nav-btn text-stone-500 hover:text-amber-600 font-medium transition" id="nav-analysis">適合度分析</button>
+                    <button onclick="navigateTo('apply')" class="bg-amber-600 text-white px-4 py-2 rounded-lg hover:bg-amber-700 transition font-bold shadow-md transform hover:-translate-y-0.5" id="nav-apply">立即申請 (限額3名)</button>
+                </nav>
+                <!-- Mobile menu button placeholder (simplified for single file) -->
+                <button onclick="toggleMobileMenu()" class="md:hidden text-stone-500 focus:outline-none">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+            <!-- Mobile Nav -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4">
+                <button onclick="navigateTo('home')" class="block py-2 text-stone-600 hover:text-amber-600 w-full text-left">計畫說明</button>
+                <button onclick="navigateTo('analysis')" class="block py-2 text-stone-600 hover:text-amber-600 w-full text-left">適合度分析</button>
+                <button onclick="navigateTo('apply')" class="block py-2 text-amber-700 font-bold w-full text-left">前往申請</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen">
+
+        <!-- SECTION 1: HOME / OVERVIEW -->
+        <section id="section-home" class="fade-in block">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-extrabold text-stone-900 mb-4 leading-tight">
+                    將您的<span class="text-amber-600">真實痛點</span>轉化為<br>AI 自動化解決方案
+                </h1>
+                <p class="text-lg text-stone-600 max-w-2xl mx-auto">
+                    這不是一場單向的講座。這是一場基於「真實案例」的實作實驗。我們尋找 3 位擁有「具體難題」的參與者，現場利用 AI 拆解、分析並嘗試解決。
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <!-- Value Prop Card -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-stone-100 hover:shadow-lg transition">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fa-solid fa-bullseye text-amber-500 mr-2"></i> 我們在尋找什麼？
+                    </h3>
+                    <p class="text-stone-600 mb-4">
+                        我們不談空泛的理論。我們在尋找那些<b>「現在無法解決，但似乎有機會用 AI 輔助甚至倍速完成」</b>的具體問題。
+                    </p>
+                    <ul class="space-y-2 text-sm text-stone-600">
+                        <li class="flex items-start"><i class="fa-solid fa-check text-green-500 mt-1 mr-2"></i> 繁瑣、重複性高但需要判斷力的工作</li>
+                        <li class="flex items-start"><i class="fa-solid fa-check text-green-500 mt-1 mr-2"></i> 需要處理大量數據或文本的整理工作</li>
+                        <li class="flex items-start"><i class="fa-solid fa-check text-green-500 mt-1 mr-2"></i> 創意發想遇到瓶頸，需要結構化輔助</li>
+                    </ul>
+                </div>
+
+                <!-- Chart Container: Candidate Profile -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-stone-100 flex flex-col justify-center">
+                    <h3 class="text-lg font-bold mb-2 text-center text-stone-700">理想參與者特質</h3>
+                    <div class="chart-container">
+                        <canvas id="candidateRadarChart"></canvas>
+                    </div>
+                    <p class="text-xs text-center text-stone-400 mt-2">基於過往 AI 導入成功率的評估模型</p>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button onclick="navigateTo('analysis')" class="bg-white text-stone-700 border-2 border-stone-200 px-8 py-3 rounded-full hover:border-amber-500 hover:text-amber-600 transition font-bold">
+                    下一步：檢測您的痛點是否適合 AI <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- SECTION 2: ANALYSIS / EDUCATION -->
+        <section id="section-analysis" class="hidden fade-in">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-stone-900 mb-4">什麼樣的問題最適合用 AI 解決？</h2>
+                <p class="text-stone-600">在您填寫申請表之前，請先參考以下分析，這有助於您釐清痛點的描述，提高入選機率。</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+                <!-- Interactive Chart: Task Types -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="text-lg font-bold mb-4 text-stone-700">AI 解決方案的效益熱點</h3>
+                    <div class="chart-container">
+                        <canvas id="impactBarChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Info Cards -->
+                <div class="space-y-4">
+                    <div class="bg-amber-50 p-5 rounded-xl border border-amber-100">
+                        <h4 class="font-bold text-amber-800 mb-2"><i class="fa-solid fa-lightbulb mr-2"></i>好案例範本</h4>
+                        <p class="text-sm text-stone-700 leading-relaxed">
+                            「我每週要看 50 份格式不一的客戶反饋，並整理成固定格式的 Excel 週報，這花了我 4 小時。我希望 AI 能自動抓重點並分類。」
+                        </p>
+                    </div>
+                    <div class="bg-stone-100 p-5 rounded-xl border border-stone-200">
+                        <h4 class="font-bold text-stone-700 mb-2"><i class="fa-solid fa-triangle-exclamation mr-2"></i>較難執行的案例</h4>
+                        <p class="text-sm text-stone-600 leading-relaxed">
+                            「我想用 AI 幫我賺大錢。」或是「我想做一個類似 Uber 的 App。」<br>
+                            <span class="text-xs text-stone-500 mt-1 block">(範圍太廣、目標不明確、涉及過多非 AI 的系統工程)</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-inner bg-gradient-to-r from-stone-50 to-white border border-stone-100 text-center">
+                <h3 class="text-xl font-bold mb-4">準備好分享您的挑戰了嗎？</h3>
+                <p class="mb-6 text-stone-600">由於本次為深度實作分享，僅開放 <span class="font-bold text-amber-600 text-lg">3</span> 個名額。我們將根據問題的「具體性」與「AI 解決潛力」進行篩選。</p>
+                <button onclick="navigateTo('apply')" class="bg-amber-600 text-white px-10 py-4 rounded-lg hover:bg-amber-700 transition font-bold shadow-lg text-lg">
+                    填寫申請問卷 <i class="fa-solid fa-pen-nib ml-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- SECTION 3: APPLICATION FORM -->
+        <section id="section-apply" class="hidden fade-in">
+            <div class="max-w-3xl mx-auto">
+                <div class="mb-8 border-l-4 border-amber-500 pl-4">
+                    <h2 class="text-2xl font-bold text-stone-900">參與者篩選問卷</h2>
+                    <p class="text-stone-500 mt-1">請詳實填寫，您的回答將決定我們能否在活動中為您提供協助。</p>
+                </div>
+
+                <form id="applicationForm" class="space-y-6" onsubmit="handleFormSubmit(event)">
+                    
+                    <!-- Basic Info Group -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <h3 class="text-lg font-bold text-stone-800 mb-4 border-b pb-2">基本資料</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-stone-700 mb-1">姓名 / 暱稱</label>
+                                <input type="text" required class="w-full bg-stone-50 border border-stone-300 rounded-lg px-4 py-2 input-focus" placeholder="您的稱呼">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-stone-700 mb-1">聯絡 Email</label>
+                                <input type="email" required class="w-full bg-stone-50 border border-stone-300 rounded-lg px-4 py-2 input-focus" placeholder="通知入選結果用">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-stone-700 mb-1">職業 / 領域</label>
+                                <input type="text" class="w-full bg-stone-50 border border-stone-300 rounded-lg px-4 py-2 input-focus" placeholder="例如：行銷企劃、工程師、會計...">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-stone-700 mb-1">AI 使用經驗 (1-5分)</label>
+                                <select class="w-full bg-stone-50 border border-stone-300 rounded-lg px-4 py-2 input-focus">
+                                    <option value="1">1 - 完全新手</option>
+                                    <option value="2">2 - 用過幾次 ChatGPT</option>
+                                    <option value="3">3 - 每週都會使用</option>
+                                    <option value="4">4 - 已在工作流程中使用</option>
+                                    <option value="5">5 - 重度依賴者</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- The Core Question -->
+                    <div class="bg-white p-6 rounded-xl shadow-md border-2 border-amber-100 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
+                            必填核心題
+                        </div>
+                        <label class="block text-lg font-bold text-stone-900 mb-2">
+                            你想解決的痛點是什麼？
+                        </label>
+                        <p class="text-sm text-stone-500 mb-3">
+                            必須是 <span class="text-amber-600 font-medium">現在無法解決 (或非常耗時)</span> 但似乎有機會用 AI 輔助解決甚至倍速完成的問題。請盡量描述「輸入資料是什麼」、「期待的輸出是什麼」以及「目前的困難點」。
+                        </p>
+                        <textarea 
+                            id="painPointInput"
+                            required 
+                            rows="6" 
+                            class="w-full bg-stone-50 border border-stone-300 rounded-lg px-4 py-3 input-focus resize-none"
+                            placeholder="例如：我每天需要從 20 個不同的新聞網站蒐集關於『半導體供應鏈』的新聞，並整理成摘要。目前的困難是來源太多，且很多重複資訊，人工篩選花費 2 小時。我希望 AI 能自動抓取並去除重複，生成 500 字簡報。"
+                            oninput="updateWordCount(this)"></textarea>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-xs text-stone-400" id="wordCount">0 字 (建議詳述以利評估)</span>
+                            <span class="text-xs text-amber-600 font-bold hidden" id="goodJobBadges"><i class="fa-solid fa-star"></i> 描述得很具體！</span>
+                        </div>
+                    </div>
+
+                    <!-- Feasibility & Commitment -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <h3 class="text-lg font-bold text-stone-800 mb-4 border-b pb-2">執行細節評估</h3>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-stone-700 mb-1">為了這個問題，您目前嘗試過什麼方法？</label>
+                                <input type="text" class="w-full bg-stone-50 border border-stone-300 rounded-lg px-4 py-2 input-focus" placeholder="例如：手動複製貼上、寫過簡單的 Python 腳本但失敗了...">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-stone-700 mb-1">是否有現成的數據/資料可供測試？</label>
+                                <p class="text-xs text-stone-500 mb-2">由於是實戰工作坊，我們需要有「素材」才能製作「料理」。</p>
+                                <div class="flex space-x-4">
+                                    <label class="flex items-center space-x-2 cursor-pointer">
+                                        <input type="radio" name="dataReady" value="yes" class="form-radio text-amber-600">
+                                        <span class="text-sm text-stone-700">有，隨時可提供</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2 cursor-pointer">
+                                        <input type="radio" name="dataReady" value="partial" class="form-radio text-amber-600">
+                                        <span class="text-sm text-stone-700">部分有，需要整理</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2 cursor-pointer">
+                                        <input type="radio" name="dataReady" value="no" class="form-radio text-amber-600">
+                                        <span class="text-sm text-stone-700">目前沒有資料</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="pt-2">
+                                <label class="flex items-start space-x-3">
+                                    <input type="checkbox" required class="form-checkbox h-5 w-5 text-amber-600 mt-0.5">
+                                    <span class="text-sm text-stone-600">
+                                        我理解這是一場分享會，我願意在活動中透過螢幕分享或解說我的案例，讓大家共同學習。
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Action -->
+                    <div class="text-center pt-4">
+                        <button type="submit" class="w-full md:w-auto bg-stone-800 text-white px-12 py-4 rounded-lg hover:bg-stone-900 transition font-bold text-lg shadow-lg flex items-center justify-center mx-auto">
+                            <span>提交申請</span>
+                            <i class="fa-solid fa-paper-plane ml-2"></i>
+                        </button>
+                        <p class="text-xs text-stone-400 mt-4">我們將在審核後透過 Email 通知結果。資料僅用於活動審核。</p>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-stone-100 py-8 border-t border-stone-200 mt-8">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p class="text-stone-500 text-sm">AI 痛點解決實驗室 © 2025</p>
+            <p class="text-stone-400 text-xs mt-1">Designed for Impact & Action.</p>
+        </div>
+    </footer>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 fade-in">
+        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full mx-4 text-center">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-check text-green-600 text-3xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-stone-900 mb-2">申請已送出！</h3>
+            <p class="text-stone-600 mb-6">感謝您的參與。我們已收到您的痛點描述。如果您的案例入選，我們將儘快與您聯繫。</p>
+            <button onclick="closeModal()" class="bg-stone-800 text-white px-6 py-2 rounded-lg hover:bg-stone-900 transition">好的，我知道了</button>
+        </div>
+    </div>
+
+    <script>
+        // State Management
+        let currentState = 'home';
+        const formDataStore = {};
+
+        // Data for Charts
+        const radarData = {
+            labels: ['問題具體度', '資料準備度', 'AI 開放性', '迫切程度', '邏輯清晰度'],
+            datasets: [{
+                label: '理想參與者指標',
+                data: [9, 8, 10, 7, 8],
+                fill: true,
+                backgroundColor: 'rgba(217, 119, 6, 0.2)', // Amber 600 with opacity
+                borderColor: 'rgb(217, 119, 6)',
+                pointBackgroundColor: 'rgb(217, 119, 6)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgb(217, 119, 6)'
+            }]
+        };
+
+        const barData = {
+            labels: ['重複性文書處理', '資料清洗與整理', '內容生成與改寫', '程式碼輔助撰寫', '創意發想'],
+            datasets: [{
+                label: 'AI 解決效率提升倍率 (預估)',
+                data: [10, 8, 5, 4, 2],
+                backgroundColor: [
+                    'rgba(217, 119, 6, 0.8)',
+                    'rgba(217, 119, 6, 0.6)',
+                    'rgba(168, 162, 158, 0.8)', // Stone 400
+                    'rgba(168, 162, 158, 0.6)',
+                    'rgba(168, 162, 158, 0.4)'
+                ],
+                borderColor: 'transparent',
+                borderWidth: 1
+            }]
+        };
+
+        // Navigation Logic
+        function navigateTo(sectionId) {
+            // Update UI State
+            document.querySelectorAll('section').forEach(sec => {
+                sec.classList.add('hidden');
+            });
+            document.getElementById(`section-${sectionId}`).classList.remove('hidden');
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Update Nav Styling
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-amber-600', 'font-bold');
+                btn.classList.add('text-stone-500');
+            });
+            const activeBtn = document.getElementById(`nav-${sectionId}`);
+            if (activeBtn && sectionId !== 'apply') {
+                activeBtn.classList.add('text-amber-600', 'font-bold');
+                activeBtn.classList.remove('text-stone-500');
+            }
+
+            // Trigger Charts if entering Analysis section
+            if (sectionId === 'analysis') {
+                renderBarChart();
+            }
+
+            // Close mobile menu if open
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Chart Rendering Logic
+        let radarChartInstance = null;
+        let barChartInstance = null;
+
+        function initCharts() {
+            const ctxRadar = document.getElementById('candidateRadarChart').getContext('2d');
+            radarChartInstance = new Chart(ctxRadar, {
+                type: 'radar',
+                data: radarData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#e7e5e4' }, // Stone 200
+                            grid: { color: '#e7e5e4' },
+                            pointLabels: {
+                                font: { size: 12, family: "'Noto Sans TC', sans-serif" },
+                                color: '#44403c' // Stone 700
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 10
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        function renderBarChart() {
+            if (barChartInstance) return; // Only render once
+            const ctxBar = document.getElementById('impactBarChart').getContext('2d');
+            barChartInstance = new Chart(ctxBar, {
+                type: 'bar',
+                data: barData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y', // Horizontal bar chart
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `預估效率提升: ${context.raw} 倍`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { display: false }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { 
+                                font: { size: 14, family: "'Noto Sans TC', sans-serif", weight: 'bold' },
+                                color: '#44403c'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Form Logic
+        function updateWordCount(textarea) {
+            const length = textarea.value.length;
+            const counter = document.getElementById('wordCount');
+            const badge = document.getElementById('goodJobBadges');
+            
+            counter.innerText = `${length} 字`;
+            
+            if (length > 30) {
+                badge.classList.remove('hidden');
+                badge.classList.add('inline-block');
+            } else {
+                badge.classList.add('hidden');
+                badge.classList.remove('inline-block');
+            }
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            // Collect Data
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            data.painPoint = document.getElementById('painPointInput').value; // Get manually
+            
+            console.log("Form Submitted:", data);
+            
+            // Show Success Modal
+            document.getElementById('successModal').classList.remove('hidden');
+            document.getElementById('successModal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('successModal').classList.add('hidden');
+            document.getElementById('successModal').classList.remove('flex');
+            navigateTo('home');
+            document.getElementById('applicationForm').reset();
+        }
+
+        // Initialize on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+        });
+
+    </script>
+</body>
+<!-- Chosen Palette: Warm Neutrals (Stone/Warm Grey) with Amber/Orange Accent for Action. Represents stability + energy/innovation. -->
+<!-- Application Structure Plan: 
+    1. Home/Overview: Dashboard-style summary of the "Opportunity" (scarcity, goal) and "Ideal Candidate" (Radar Chart). Focus on setting expectations.
+    2. Analysis/Education: Before asking for input, educate the user on what constitutes a "Good AI Problem" using a Bar Chart comparison and clear text examples. This improves the quality of submissions.
+    3. Application Form: The core interactive element. A streamlined form with real-time feedback (word count) on the critical "Pain Point" question. 
+    This flow ensures users self-qualify before filling out the form, saving time for both the user and the organizer.
+-->
+<!-- Visualization & Content Choices:
+    1. Radar Chart (Chart.js): Visualizes the abstract concept of "Ideal Candidate" (Data readiness vs Tech skill) to guide users on whether they fit.
+    2. Horizontal Bar Chart (Chart.js): Compares different problem types by "Efficiency Gain" to inspire users to choose high-impact pain points.
+    3. Interactive Form: Real-time validation and gamified "Good Job" badge encourages detailed responses for the critical open-ended question.
+    4. NO SVG/Mermaid: Used FontAwesome for icons and Chart.js for data viz.
+-->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</html>
