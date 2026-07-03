@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>探月学院素养模型 · 深度解读报告</title>
+<style>
+  :root{
+    --bg:#0e0d0c; --bg2:#161412; --card:#1c1917; --card2:#211d1a;
+    --line:#332e2a; --line2:#403a35;
+    --txt:#ece7e1; --muted:#a49b91; --dim:#7c736a;
+    --accent:#f0642a; --accent2:#f59e42; --gold:#e0b463;
+    --q1:#f0642a; --q2:#e8934a; --q3:#c99a5b; --q4:#d97a4a;
+    --maxw:1120px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:
+      radial-gradient(1200px 700px at 50% -10%, #241f1b 0%, rgba(36,31,27,0) 60%),
+      var(--bg);
+    color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",sans-serif;
+    line-height:1.75; -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent2);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px}
+
+  /* ---------- HERO ---------- */
+  .hero{position:relative;padding:88px 0 40px;text-align:center;overflow:hidden}
+  .kicker{display:inline-block;letter-spacing:.32em;font-size:12px;color:var(--accent);
+    border:1px solid var(--line2);border-radius:999px;padding:6px 16px;margin-bottom:26px;text-transform:uppercase}
+  .hero h1{font-size:clamp(30px,5.4vw,54px);line-height:1.18;margin:0 0 18px;font-weight:800;letter-spacing:.01em}
+  .hero h1 .hl{color:var(--accent)}
+  .hero p.sub{max-width:720px;margin:0 auto;color:var(--muted);font-size:clamp(15px,2vw,18px)}
+  .hero .meta{margin-top:26px;color:var(--dim);font-size:13px;letter-spacing:.04em}
+  .hero .meta b{color:var(--muted);font-weight:600}
+
+  /* ---------- SECTION ---------- */
+  section{padding:54px 0}
+  .sec-head{margin-bottom:34px}
+  .sec-num{font-size:13px;letter-spacing:.3em;color:var(--accent);font-weight:700}
+  .sec-head h2{font-size:clamp(24px,3.6vw,36px);margin:8px 0 10px;font-weight:800;letter-spacing:.01em}
+  .sec-head p{color:var(--muted);max-width:820px;margin:0;font-size:15.5px}
+  .divider{height:1px;background:linear-gradient(90deg,transparent,var(--line2),transparent);border:0;margin:0}
+
+  /* ---------- WHEEL ---------- */
+  .wheelbox{background:radial-gradient(circle at 50% 45%, #1a1613 0%, #0c0b0a 78%);
+    border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+  .wheel{width:100%;height:auto;display:block;max-width:760px;margin:0 auto}
+  .wheel .seg{stroke:#0e0d0c;stroke-width:2;fill:#24201d;transition:fill .25s}
+  .wheel .seg-out{fill:#221e1b}
+  .wheel .seg-out.q1{fill:#241d18}.wheel .seg-out.q2{fill:#241f19}
+  .wheel .seg-out.q3{fill:#211e1a}.wheel .seg-out.q4{fill:#231d19}
+  .wheel .seg-out:hover{fill:#3a2a1e}
+  .wheel .seg-in{fill:url(#gInner)}
+  .wheel .seg-in:hover{fill:#3a332d}
+  .wheel .core-outer{fill:url(#gCore);stroke:#4a4038;stroke-width:1.5}
+  .wheel .core-inner{fill:#181413;stroke:var(--accent);stroke-width:1.6}
+  .wheel text{font-family:inherit;fill:var(--txt);text-anchor:middle;dominant-baseline:middle}
+  .wheel .lbl-cn{font-size:15px;font-weight:700;fill:#f2ede7}
+  .wheel .lbl-en{font-size:9px;fill:#8f857a;letter-spacing:.02em}
+  .wheel .lbl-cn.out{font-size:14px}
+  .wheel .core-t1{font-size:12px;fill:var(--gold);letter-spacing:.14em;font-weight:700}
+  .wheel .core-t2{font-size:13.5px;fill:#f4efe9;font-weight:700}
+  .wheel .dom-en{font-size:13px;fill:var(--dim);letter-spacing:.06em}
+  .wheel .dom-cn{font-size:24px;font-weight:800;fill:var(--accent)}
+
+  .legend{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:26px}
+  .legend .item{display:flex;align-items:center;gap:9px;font-size:13.5px;color:var(--muted);
+    background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 15px}
+  .legend .dot{width:11px;height:11px;border-radius:50%}
+
+  /* layer guide */
+  .layers{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:34px}
+  .layer{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 18px;position:relative}
+  .layer .ln{font-size:12px;color:var(--accent);font-weight:700;letter-spacing:.12em}
+  .layer h4{margin:8px 0 6px;font-size:17px}
+  .layer p{margin:0;color:var(--muted);font-size:13.5px}
+  .layer .arrow{position:absolute;right:-13px;top:50%;transform:translateY(-50%);color:var(--line2);font-size:20px;z-index:2}
+  .layer:last-child .arrow{display:none}
+
+  /* ---------- CARDS ---------- */
+  .grid{display:grid;gap:18px}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);
+    border-radius:18px;padding:24px 22px;position:relative;overflow:hidden}
+  .card::before{content:"";position:absolute;left:0;top:0;height:100%;width:4px;background:var(--accent);opacity:.85}
+  .card .idx{font-size:12px;color:var(--dim);letter-spacing:.15em;font-weight:700}
+  .card h3{margin:6px 0 2px;font-size:20px;font-weight:800}
+  .card .en{color:var(--accent2);font-size:12.5px;letter-spacing:.06em;margin-bottom:12px;font-weight:600}
+  .card p{margin:0 0 12px;font-size:14.5px;color:var(--txt);opacity:.92}
+  .card .tag{display:inline-block;font-size:11.5px;color:var(--muted);background:#0f0d0c;
+    border:1px solid var(--line2);border-radius:6px;padding:3px 9px;margin:0 6px 6px 0}
+  .card .pts{margin:10px 0 12px;padding:0;list-style:none}
+  .card .pts li{position:relative;padding-left:18px;font-size:13.5px;color:var(--muted);margin-bottom:5px}
+  .card .pts li::before{content:"";position:absolute;left:2px;top:9px;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  .card .quote{margin-top:14px;padding:12px 14px;background:#100e0d;border-left:2px solid var(--gold);
+    border-radius:0 8px 8px 0;color:var(--gold);font-size:13.5px;font-style:italic}
+
+  .subhead{display:flex;align-items:center;gap:14px;margin:38px 0 20px}
+  .subhead .bar{width:34px;height:3px;background:var(--accent);border-radius:2px}
+  .subhead h3{margin:0;font-size:19px;font-weight:800}
+  .subhead span{color:var(--dim);font-size:13px}
+
+  /* domain cards */
+  .dcard{background:linear-gradient(135deg,#221c17,#18140f);border:1px solid var(--line2);border-radius:18px;padding:26px 24px}
+  .dcard .dnum{font-size:34px;font-weight:800;color:var(--line2);line-height:1}
+  .dcard h3{font-size:22px;margin:10px 0 2px}
+  .dcard .en{color:var(--accent2);font-size:13px;margin-bottom:14px;letter-spacing:.05em}
+  .dcard p{font-size:14.5px;color:var(--muted);margin:0 0 12px}
+  .dcard .proj{font-size:13px;color:var(--txt);background:#0f0d0c;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .dcard .proj b{color:var(--accent2)}
+
+  /* narrative / prose */
+  .prose{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:30px 30px;font-size:15px}
+  .prose p{margin:0 0 16px;color:#ded7cf}
+  .prose p:last-child{margin-bottom:0}
+  .prose strong{color:var(--txt)}
+  .prose .lead{font-size:17px;color:var(--txt);border-left:3px solid var(--accent);padding-left:16px}
+  .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:5px;font-weight:700;letter-spacing:.05em;vertical-align:middle}
+  .b-fact{background:#153a2a;color:#6ee7a8}
+  .b-interp{background:#3a2f15;color:#e6c164}
+  .b-guess{background:#3a1f2a;color:#e88aa8}
+
+  .facts{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:26px}
+  .fact{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 16px;text-align:center}
+  .fact .big{font-size:30px;font-weight:800;color:var(--accent);line-height:1}
+  .fact .lab{font-size:12.5px;color:var(--muted);margin-top:8px}
+
+  /* mission split */
+  .msplit{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:26px}
+  .mcol{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:18px;padding:28px 26px}
+  .mcol .lab{font-size:12px;letter-spacing:.2em;color:var(--accent);font-weight:700}
+  .mcol h3{font-size:26px;margin:10px 0 12px}
+  .mcol p{color:var(--muted);font-size:14.5px;margin:0}
+  .mcol.inward{border-top:3px solid var(--gold)}
+  .mcol.outward{border-top:3px solid var(--accent)}
+
+  /* sources */
+  .srcs{columns:2;column-gap:28px}
+  .srcs a{display:block;font-size:13.5px;margin-bottom:9px;break-inside:avoid;color:var(--muted)}
+  .srcs a:hover{color:var(--accent2)}
+
+  footer{border-top:1px solid var(--line);padding:34px 0 60px;color:var(--dim);font-size:13px;text-align:center}
+  footer .disc{max-width:760px;margin:0 auto 14px;line-height:1.7}
+
+  @media(max-width:860px){
+    .g3,.g2,.layers,.facts,.msplit{grid-template-columns:1fr}
+    .layer .arrow{display:none}
+    .srcs{columns:1}
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <span class="kicker">Moonshot Academy · 素养模型深度解读</span>
+    <h1>学科不是终点，<span class="hl">人</span>才是<br>探月学院「同心圆」素养模型全解</h1>
+    <p class="sub">一张来自「硅谷101」的黑底同心圆图，浓缩了一所中国创新学校近十年的教育哲学。本报告将它逐层拆解——从最核心的使命，到心智性情、能力，再到四大学术领域——并为每一项补上其在全局中应有的详细内涵。</p>
+    <div class="meta"><b>核心使命</b>：内心丰盈的个体，积极行动的公民　·　<b>结构</b>：1 使命 / 6 心智 / 12 能力 / 4 领域</div>
+  </div>
+</header>
+
+<hr class="divider">
+
+<!-- 1. 模型总览 -->
+<section id="overview">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">01 — THE MODEL</div>
+      <h2>模型总览：一张由内向外推演的教育蓝图</h2>
+      <p>同心圆由内到外是一条「由目的到手段」的推演链：先确定要培养什么样的人（使命），再倒推需要哪些内在品格（心智性情）、可迁移技能（能力），最后才是承载它们的学科。图底那句话点破了全部——<strong>「最终都是为了回应这些能力的发展」</strong>。</p>
+    </div>
+
+    <div class="wheelbox">
+<svg viewBox="0 0 1000 1000" class="wheel" role="img" aria-label="探月学院素养模型同心圆">
+<defs><radialGradient id="gCore" cx="50%" cy="45%" r="65%"><stop offset="0%" stop-color="#3a3230"/><stop offset="100%" stop-color="#181615"/></radialGradient><radialGradient id="gInner" cx="50%" cy="40%" r="75%"><stop offset="0%" stop-color="#4a4340"/><stop offset="100%" stop-color="#211e1c"/></radialGradient></defs>
+<path d="M 335.00 214.21 A 330 330 0 0 1 500.00 170.00 L 500.00 295.00 A 205 205 0 0 0 397.50 322.46 Z" class="seg seg-out q1"/>
+<path d="M 500.00 170.00 A 330 330 0 0 1 665.00 214.21 L 602.50 322.46 A 205 205 0 0 0 500.00 295.00 Z" class="seg seg-out q2"/>
+<path d="M 665.00 214.21 A 330 330 0 0 1 785.79 335.00 L 677.54 397.50 A 205 205 0 0 0 602.50 322.46 Z" class="seg seg-out q2"/>
+<path d="M 785.79 335.00 A 330 330 0 0 1 830.00 500.00 L 705.00 500.00 A 205 205 0 0 0 677.54 397.50 Z" class="seg seg-out q2"/>
+<path d="M 830.00 500.00 A 330 330 0 0 1 785.79 665.00 L 677.54 602.50 A 205 205 0 0 0 705.00 500.00 Z" class="seg seg-out q4"/>
+<path d="M 785.79 665.00 A 330 330 0 0 1 665.00 785.79 L 602.50 677.54 A 205 205 0 0 0 677.54 602.50 Z" class="seg seg-out q4"/>
+<path d="M 665.00 785.79 A 330 330 0 0 1 500.00 830.00 L 500.00 705.00 A 205 205 0 0 0 602.50 677.54 Z" class="seg seg-out q4"/>
+<path d="M 500.00 830.00 A 330 330 0 0 1 335.00 785.79 L 397.50 677.54 A 205 205 0 0 0 500.00 705.00 Z" class="seg seg-out q3"/>
+<path d="M 335.00 785.79 A 330 330 0 0 1 214.21 665.00 L 322.46 602.50 A 205 205 0 0 0 397.50 677.54 Z" class="seg seg-out q3"/>
+<path d="M 214.21 665.00 A 330 330 0 0 1 170.00 500.00 L 295.00 500.00 A 205 205 0 0 0 322.46 602.50 Z" class="seg seg-out q3"/>
+<path d="M 170.00 500.00 A 330 330 0 0 1 214.21 335.00 L 322.46 397.50 A 205 205 0 0 0 295.00 500.00 Z" class="seg seg-out q1"/>
+<path d="M 214.21 335.00 A 330 330 0 0 1 335.00 214.21 L 397.50 322.46 A 205 205 0 0 0 322.46 397.50 Z" class="seg seg-out q1"/>
+<path d="M 322.46 397.50 A 205 205 0 0 1 500.00 295.00 L 500.00 405.00 A 95 95 0 0 0 417.73 452.50 Z" class="seg seg-in"/>
+<path d="M 500.00 295.00 A 205 205 0 0 1 677.54 397.50 L 582.27 452.50 A 95 95 0 0 0 500.00 405.00 Z" class="seg seg-in"/>
+<path d="M 677.54 397.50 A 205 205 0 0 1 677.54 602.50 L 582.27 547.50 A 95 95 0 0 0 582.27 452.50 Z" class="seg seg-in"/>
+<path d="M 677.54 602.50 A 205 205 0 0 1 500.00 705.00 L 500.00 595.00 A 95 95 0 0 0 582.27 547.50 Z" class="seg seg-in"/>
+<path d="M 500.00 705.00 A 205 205 0 0 1 322.46 602.50 L 417.73 547.50 A 95 95 0 0 0 500.00 595.00 Z" class="seg seg-in"/>
+<path d="M 322.46 602.50 A 205 205 0 0 1 322.46 397.50 L 417.73 452.50 A 95 95 0 0 0 417.73 547.50 Z" class="seg seg-in"/>
+<circle cx="500" cy="500" r="95" class="core-outer"/>
+<circle cx="500" cy="500" r="62" class="core-inner"/>
+<text x="425.0" y="364.1" class="lbl-en in">Strive for Excellence</text><text x="425.0" y="383.1" class="lbl-cn in">持续精进</text>
+<text x="575.0" y="364.1" class="lbl-en in">Self Caring</text><text x="575.0" y="383.1" class="lbl-cn in">自我观照</text>
+<text x="650.0" y="494.0" class="lbl-en in">Empowering Empathy</text><text x="650.0" y="513.0" class="lbl-cn in">赋能同理</text>
+<text x="575.0" y="623.9" class="lbl-en in">Curiosity</text><text x="575.0" y="642.9" class="lbl-cn in">好奇心</text>
+<text x="425.0" y="623.9" class="lbl-en in">Imagination</text><text x="425.0" y="642.9" class="lbl-cn in">想象力</text>
+<text x="350.0" y="494.0" class="lbl-en in">Growth Mindset</text><text x="350.0" y="513.0" class="lbl-cn in">成长型思维</text>
+<text x="430.8" y="235.6" class="lbl-en out q1">Sustain Wellness</text><text x="430.8" y="254.6" class="lbl-cn out q1">身心健康</text>
+<text x="569.2" y="235.6" class="lbl-en out q2">Civic Responsibility</text><text x="569.2" y="254.6" class="lbl-cn out q2">公民责任</text>
+<text x="689.2" y="304.8" class="lbl-en out q2">Leading & Collaborating</text><text x="689.2" y="323.8" class="lbl-cn out q2">合作引领</text>
+<text x="758.4" y="424.8" class="lbl-en out q2">Building Connections</text><text x="758.4" y="443.8" class="lbl-cn out q2">建立连接</text>
+<text x="758.4" y="563.2" class="lbl-en out q4">Expression</text><text x="758.4" y="582.2" class="lbl-cn out q4">表达</text>
+<text x="689.2" y="683.2" class="lbl-en out q4">Design Solutions</text><text x="689.2" y="702.2" class="lbl-cn out q4">方案设计</text>
+<text x="569.2" y="752.4" class="lbl-en out q4">Analysis & Synthesis</text><text x="569.2" y="771.4" class="lbl-cn out q4">分析综合</text>
+<text x="430.8" y="752.4" class="lbl-en out q3">Inquiry</text><text x="430.8" y="771.4" class="lbl-cn out q3">探究</text>
+<text x="310.8" y="683.2" class="lbl-en out q3">Using Sources</text><text x="310.8" y="702.2" class="lbl-cn out q3">使用资料</text>
+<text x="241.6" y="563.2" class="lbl-en out q3">Read Critically</text><text x="241.6" y="582.2" class="lbl-cn out q3">思辨阅读</text>
+<text x="241.6" y="424.8" class="lbl-en out q1">Self-directed Learning</text><text x="241.6" y="443.8" class="lbl-cn out q1">自主学习</text>
+<text x="310.8" y="304.8" class="lbl-en out q1">Wayfinding</text><text x="310.8" y="323.8" class="lbl-cn out q1">自我认知与探索</text>
+<text x="500" y="486" class="core-t1">MSA MISSION</text>
+<text x="500" y="508" class="core-t2">内心丰盈的个体</text>
+<text x="500" y="530" class="core-t2">积极行动的公民</text>
+<text x="250" y="150" class="dom-en" text-anchor="start">Math & Science</text>
+<text x="250" y="184" class="dom-cn" text-anchor="start">数学与科学</text>
+<text x="750" y="150" class="dom-en" text-anchor="end">D.R.E.A.M</text>
+<text x="750" y="184" class="dom-cn" text-anchor="end">科创与设计</text>
+<text x="250" y="865" class="dom-en" text-anchor="start">Social & Humanities</text>
+<text x="250" y="899" class="dom-cn" text-anchor="start">社会与人文</text>
+<text x="750" y="865" class="dom-en" text-anchor="end">Art & P.E</text>
+<text x="750" y="899" class="dom-cn" text-anchor="end">艺术与体育</text>
+</svg>
+    </div>
+
+    <div class="legend">
+      <div class="item"><span class="dot" style="background:var(--gold)"></span>核心 · 使命 MISSION</div>
+      <div class="item"><span class="dot" style="background:#7a6f64"></span>内环 · 心智性情 Dispositions</div>
+      <div class="item"><span class="dot" style="background:var(--accent2)"></span>外环 · 能力 Competencies</div>
+      <div class="item"><span class="dot" style="background:var(--accent)"></span>最外 · 学术领域 Domains</div>
+    </div>
+
+    <div class="layers">
+      <div class="layer"><div class="ln">CORE</div><h4>使命</h4><p>回答「培养什么人」——价值原点，一切设计的起点。<span class="arrow">→</span></p></div>
+      <div class="layer"><div class="ln">RING 1</div><h4>心智性情</h4><p>支撑使命的内在驱动与态度，是人格底色。<span class="arrow">→</span></p></div>
+      <div class="layer"><div class="ln">RING 2</div><h4>能力素养</h4><p>可训练、可展现、可评价的技能，是使命的操作化表达。<span class="arrow">→</span></p></div>
+      <div class="layer"><div class="ln">OUTER</div><h4>学术领域</h4><p>四大学科——不是目的，而是发展素养的载体与素材。</p></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- 2. 探月学院背景 -->
+<section id="background">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">02 — THE SCHOOL</div>
+      <h2>探月学院：一场「另一种教育可行吗」的实验</h2>
+      <p>要读懂这张图，先要认识画图的人。</p>
+    </div>
+
+    <div class="prose">
+      <p class="lead">探月学院（Moonshot Academy，MSA）是一所根植中国、面向全球的创新型学校，位于北京朝阳区，2018 年正式开学。创始人 <strong>王熙乔（Jason Wang）</strong> 是一位「95 后」——毕业于北大附中国际部，曾获美国南加州大学天体物理专业录取，却选择休学，在 19 岁投身办学。</p>
+      <p>校名「探月」取自肯尼迪的「登月计划（Moonshot）」演讲，象征以近乎不可能的宏大目标驱动创新。早在 2015 年、18 岁时，王熙乔就撰文预判：随着人工智能发展，大量重复性工作将被机器取代，未来真正稀缺的是<strong>创造力、好奇心与持续学习探索的能力</strong>。这一判断，正是整个素养模型的思想起点。</p>
+      <p>经过近十年发展，探月已从最初的高中段，扩展为覆盖小学、初中、高中的全学段体系。在中国创新教育谱系中，它被视为「大学之外第三种可能」的代表性实验：不以高考分数为核心，而以素养、真实成果与自我探索为主线。<span class="badge b-fact">事实</span></p>
+    </div>
+
+    <div class="facts">
+      <div class="fact"><div class="big">2018</div><div class="lab">正式开学（2017 筹备发布）</div></div>
+      <div class="fact"><div class="big">19岁</div><div class="lab">创始人王熙乔投身办学时的年龄</div></div>
+      <div class="fact"><div class="big">K12</div><div class="lab">覆盖小学 / 初中 / 高中全学段</div></div>
+      <div class="fact"><div class="big">~500</div><div class="lab">在校学生规模（约）</div></div>
+    </div>
+
+    <div class="subhead"><span class="bar"></span><h3>三个学段：一条由内向外的成长阶梯</h3></div>
+    <div class="grid g3">
+      <div class="card"><div class="idx">小学</div><h3>自我相处</h3><div class="en">Learning to be with oneself</div>
+        <p>以社会情感学习（SEL）与融合教育为主——先学会认识自己、与自己相处、理解他人。这是「内心丰盈」的起步。</p></div>
+      <div class="card"><div class="idx">初中</div><h3>解决问题</h3><div class="en">Solving real problems</div>
+        <p>以跨学科项目与生活技能课程为主——把自我理解延伸到真实情境中的协作与应对，向外迈出第一步。</p></div>
+      <div class="card"><div class="idx">高中</div><h3>创造者的训练场</h3><div class="en">A maker's training ground</div>
+        <p>以「一小步计划（One Small Step）」、设计课与创客空间为载体，走向创造真实价值。毕业需达成「独立创业获外部融资 / 持续就业获稳定收入 / 完成项目商业化转让」三者之一。<span class="badge b-fact">事实</span></p></div>
+    </div>
+
+    <div class="prose" style="margin-top:20px">
+      <p><strong>「第一颗芯片」的隐喻。</strong> 在硅谷101的报道中，王熙乔用造芯片作比喻：在建「芯片工厂」（大规模复制推广）之前，首先要「手搓出第一颗真正可用的芯片」——先把一个深刻践行教育本质的模型打磨出来、并在其中产生卓越成果，暂不急于规模化。<span class="badge b-interp">阐释</span> 就像芯片是数字文明的底层单元，探月希望先造出一枚经得起检验的「教育底层单元」：一套素养模型 + 评价 + 真实成果的闭环，证明「另一种教育」确实可行，再谈复制。<span class="badge b-guess">推测</span></p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- 3. 核心使命 -->
+<section id="mission">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">03 — THE CORE</div>
+      <h2>核心使命：内心丰盈的个体，积极行动的公民</h2>
+      <p>使命被置于同心圆最中心，意味着它是一切课程、评价与能力设计的「原点」——越靠外，越是实现使命的手段。它由两个方向构成：一个向内，一个向外。</p>
+    </div>
+    <div class="msplit">
+      <div class="mcol inward">
+        <div class="lab">向 内 · INWARD</div>
+        <h3>内心丰盈的个体</h3>
+        <p>指向完整的人格：自我认知、情绪与心智的稳定、意义感与幸福感。一个人能与自己好好相处、拥有丰富的内在世界，而非被分数、名校等外部评价所定义。这是所有可持续成长的心理续航系统。</p>
+      </div>
+      <div class="mcol outward">
+        <div class="lab">向 外 · OUTWARD</div>
+        <h3>积极行动的公民</h3>
+        <p>指向社会参与：理解他人、投入社群、发现并解决真实问题，把内在力量转化为对世界负责任的行动。它让「丰盈」有了出口，让个体成为社会改良的参与者，而非旁观者。</p>
+      </div>
+    </div>
+    <div class="prose" style="margin-top:20px">
+      <p>这一「向内丰盈 + 向外行动」的双维结构，本质是<strong>「全人教育」与「公民教育」的结合</strong>。把它放在最中心，是在宣告：探月首先回答「教育要培养什么样的人」，再倒推需要哪些心智、能力与学科——这正是探月常说的「以终为始」。</p>
+      <p>与之配套的，是探月对「素养」的定义：<strong>稳定、可迁移</strong>。它较早引入 MTC（能力素养成绩单，Mastery Transcript Consortium），主张「以评价为中心」——不以 GPA 或 ABCD 单一分数呈现，而是通过学习过程中的作品、视频、口头答辩等「证据」，与素养标准逐条匹配。<span class="badge b-fact">事实</span> 其教育学逻辑很清晰：分数衡量的是易被 AI 替代的记忆再现，素养衡量的是难被替代的思维与行动。</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- 4. 内环 六心智 -->
+<section id="inner">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">04 — INNER RING</div>
+      <h2>内环 · 六种心智与性情（Dispositions）</h2>
+      <p>内环是一个人面对世界的默认姿态。能力可以被教会，但驱动一个人<em>反复调用</em>能力的，是这些深植于内在的态度与倾向。它回答的不是「我能不能做到」，而是「我是否愿意、是否倾向于这样做」。<br><strong>外环是「桨」，内环是「洋流」。</strong></p>
+    </div>
+    <div class="grid g3">
+
+      <div class="card"><div class="idx">01 · DISPOSITION</div><h3>持续精进</h3><div class="en">Strive for Excellence</div>
+        <p>在没有外部强制时，主动追求高于现状的标准，把「做得更好」内化为稳定的自我期待——对应心理学的「掌握目标取向」。</p>
+        <ul class="pts"><li>主动设定高于要求的标准</li><li>把反馈视为改进线索而非否定</li><li>用「过程标准」而非「排名」来培养</li></ul>
+        <div class="quote">卓越不是终点，而是一种「永远还差一点」的自我对话。</div></div>
+
+      <div class="card"><div class="idx">02 · DISPOSITION</div><h3>自我观照</h3><div class="en">Self Caring</div>
+        <p>觉察、理解并善待自身的情绪、需要与限度——融合「自我觉察」与 Kristin Neff 的「自我关怀」：失败时像对待好友一样对待自己。</p>
+        <ul class="pts"><li>能识别并命名自己的情绪</li><li>区分「行为」与「自我」：做错事 ≠ 我不好</li><li>失败后能自我安慰、复原较快</li></ul>
+        <div class="quote">一个人能走多远，取决于跌倒时能否依然温柔地把自己扶起来。</div></div>
+
+      <div class="card"><div class="idx">03 · DISPOSITION</div><h3>赋能同理</h3><div class="en">Empowering Empathy</div>
+        <p>不仅理解他人处境，更把理解转化为让对方更有力量的行动——超越情感共鸣，走向「同理关怀」：从「我懂你的难」到「我帮你站起来」。</p>
+        <ul class="pts"><li>关注沉默或被忽视者</li><li>给的是「支持」而非「替代」</li><li>决定了能力最终服务于谁</li></ul>
+        <div class="quote">真正的同理不止于「我懂你」，而在于「因为我懂你，你变得更强了」。</div></div>
+
+      <div class="card"><div class="idx">04 · DISPOSITION</div><h3>成长型思维</h3><div class="en">Growth Mindset</div>
+        <p>由 Carol Dweck 提出：相信能力可以通过努力、策略与他人帮助而发展。它是关于「能力本身能否改变」的根本信念，像一副滤镜决定人如何解读困难。</p>
+        <ul class="pts"><li>把「我还不会」（yet）挂在嘴边</li><li>从错误中提取策略</li><li>表扬「过程与策略」而非「聪明」</li></ul>
+        <div class="quote">决定上限的，往往不是现在的能力，而是你是否相信能力可以生长。</div></div>
+
+      <div class="card"><div class="idx">05 · DISPOSITION</div><h3>想象力</h3><div class="en">Imagination</div>
+        <p>在现实之外构想尚不存在之物的心智——创造的源头。它是一种「跳出标准答案、让念头自由生长」的心智习惯，而非某种创作技法。</p>
+        <ul class="pts"><li>爱问「如果……会怎样」</li><li>在不同领域间建立奇特连接</li><li>需要无目的、无标准答案的留白</li></ul>
+        <div class="quote">想象力是把「现实」当作起点而非终点的能力。</div></div>
+
+      <div class="card"><div class="idx">06 · DISPOSITION</div><h3>好奇心</h3><div class="en">Curiosity</div>
+        <p>对未知主动产生兴趣、渴望探究的内在倾向——学习最原初、最强大的内驱力，与自我决定理论的「内在动机」高度相关。无法被强迫，只能被点燃与保护。</p>
+        <ul class="pts"><li>问题越来越深入，不满足于表面答案</li><li>愿为「弄懂」而多花时间</li><li>大人要做的不是发动它，而是别熄灭它</li></ul>
+        <div class="quote">好奇心是一台永不需要外部电源的学习引擎。</div></div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- 5. 外环 十二能力 -->
+<section id="outer">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">05 — OUTER RING</div>
+      <h2>外环 · 十二项能力（Competencies）</h2>
+      <p>外环是内在价值观的「外化载体」：可训练、可观测、可展现的技能集合。它们可分为两条主线——<strong>向内的自我经营 + 向外的社会协作</strong>成就「个体与公民」，<strong>一条完整的创造链条</strong>撑起「创造者的训练场」。参照 CASEL、OECD 学习指南针 2030 等国际框架。</p>
+    </div>
+
+    <div class="subhead"><span class="bar"></span><h3>自我与社会</h3><span>夯实「内心丰盈的个体」与「积极行动的公民」</span></div>
+    <div class="grid g3">
+      <div class="card"><div class="idx">身心健康</div><h3>身心健康</h3><div class="en">Sustain Wellness</div>
+        <p>主动觉察、调节并持续维护生理、情绪与心理健康——健康是需要长期经营的日常实践。对应 CASEL 的「自我觉察 + 自我管理」。</p>
+        <span class="tag">情绪识别</span><span class="tag">压力调节</span><span class="tag">主动求助</span>
+        <div class="quote">稳固的身心是「内心丰盈」的地基，也是持久行动、抵御倦怠的前提。</div></div>
+
+      <div class="card"><div class="idx">自我认知与探索</div><h3>自我认知与探索</h3><div class="en">Wayfinding Experiences</div>
+        <p>「寻路」——在不确定中为自己定位与导航，持续探索「我是谁、我看重什么、要往哪去」，通过真实体验不断校准自我。</p>
+        <span class="tag">优势觉察</span><span class="tag">体验试错</span><span class="tag">反思提炼</span>
+        <div class="quote">清晰的自我理解带来方向感，使行动源自真实的自我。</div></div>
+
+      <div class="card"><div class="idx">自主学习</div><h3>自主学习</h3><div class="en">Self-directed Learning</div>
+        <p>无人督促下自主诊断需求、设定目标、调配资源、执行并评估——基于 Knowles 自主学习模型，是终身学习的核心引擎。</p>
+        <span class="tag">目标设定</span><span class="tag">元认知监控</span><span class="tag">自评迭代</span>
+        <div class="quote">契合探月「学生自主提交能力掌握论据」的评价机制。</div></div>
+
+      <div class="card"><div class="idx">公民责任</div><h3>公民责任</h3><div class="en">Civic Responsibility</div>
+        <p>理解自身与社群、社会乃至全球的相互依存，并愿意为公共利益承担责任、采取负责任行动——呼应 OECD「承担责任」变革性素养。</p>
+        <span class="tag">议题识别</span><span class="tag">伦理决策</span><span class="tag">公共行动</span>
+        <div class="quote">「积极行动的公民」最直接的体现：把关切落为可行动的改变。</div></div>
+
+      <div class="card"><div class="idx">合作引领</div><h3>合作引领</h3><div class="en">Leading & Collaborating in Teams</div>
+        <p>在团队中既能有效协作、也能适时引领，根据情境灵活切换「贡献者」与「引领者」，在多元团队中共建信任、协调差异。</p>
+        <span class="tag">积极倾听</span><span class="tag">冲突化解</span><span class="tag">情境化领导</span>
+        <div class="quote">真实的社会改变几乎都依赖协作——它把个体行动力放大为集体行动力。</div></div>
+
+      <div class="card"><div class="idx">建立连接</div><h3>建立连接</h3><div class="en">Building Connections</div>
+        <p>主动建立并维护真诚、支持性的人际关系与社会网络，跨越差异去理解他人，编织可信赖的关系网与社会资本。</p>
+        <span class="tag">同理倾听</span><span class="tag">跨背景沟通</span><span class="tag">链接资源</span>
+        <div class="quote">高质量关系带来归属感（丰盈），广泛连接提供协作杠杆（行动）。</div></div>
+    </div>
+
+    <div class="subhead"><span class="bar"></span><h3>学术与创造</h3><span>一条「看清 → 发问 → 求证 → 提炼 → 造物 → 影响」的完整链条</span></div>
+    <div class="grid g3">
+      <div class="card"><div class="idx">思辨阅读</div><h3>思辨阅读</h3><div class="en">Read Critically</div>
+        <p>阅读文本、数据与多模态材料时，不停留于字面，而是解码作者意图、论证结构与隐含立场，并独立评判其证据与逻辑。</p>
+        <span class="tag">追问预设</span><span class="tag">证据评估</span><span class="tag">逻辑检验</span>
+        <div class="quote">抵御信息操纵的第一道防线——先看清现状，才能重构现状。</div></div>
+
+      <div class="card"><div class="idx">探究</div><h3>探究</h3><div class="en">Inquiry</div>
+        <p>由好奇心驱动，自主提出问题、设计探索路径、收集分析证据并不断修正认知——把学习者从知识的「接受者」变为「生产者」。</p>
+        <span class="tag">提问</span><span class="tag">假设</span><span class="tag">求证反思</span>
+        <div class="quote">凡事追问「为什么、证据是什么」，是理性参与公共生活的底层能力。</div></div>
+
+      <div class="card"><div class="idx">使用资料</div><h3>使用资料</h3><div class="en">Using Sources</div>
+        <p>有策略地检索、筛选、评估、整合与规范引用信息——即「信息素养」：理解知识如何被生产、评价、共享与使用（参照 ACRL 框架）。</p>
+        <span class="tag">来源评估</span><span class="tag">交叉验证</span><span class="tag">学术规范</span>
+        <div class="quote">让创造建立在扎实证据而非直觉臆断之上。</div></div>
+
+      <div class="card"><div class="idx">分析综合</div><h3>分析综合</h3><div class="en">Analysis & Synthesis</div>
+        <p>一对咬合的高阶思维：分析把整体拆解为要素、辨明关系；综合把分散信息重新整合，生成新的模式与原创结论（布卢姆高阶层级）。</p>
+        <span class="tag">拆解建模</span><span class="tag">跨域联结</span><span class="tag">生成新知</span>
+        <div class="quote">把海量信息炼成决策的「认知引擎」。</div></div>
+
+      <div class="card"><div class="idx">方案设计</div><h3>方案设计</h3><div class="en">Design Solutions</div>
+        <p>面对真实、开放的问题，以人为中心系统性地界定问题、构想方案并通过原型迭代出可行解——设计思维（d.school 五阶段）的落地。</p>
+        <span class="tag">共情定义</span><span class="tag">快速原型</span><span class="tag">测试迭代</span>
+        <div class="quote">「创造者训练场」最直接的体现：亲历「从 0 到 1」。</div></div>
+
+      <div class="card"><div class="idx">表达</div><h3>表达</h3><div class="en">Expression</div>
+        <p>将思想、情感与成果以清晰、有说服力且适配受众的方式传递——口头、书面、视觉或多媒体。能力体系的「输出端」。</p>
+        <span class="tag">结构化组织</span><span class="tag">受众意识</span><span class="tag">论证说服</span>
+        <div class="quote">探月以「答辩」为核心评价——把个人洞见转化为公共影响力的桥梁。</div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- 6. 四大学术领域 -->
+<section id="domains">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">06 — DOMAINS</div>
+      <h2>四大学术领域：不是目的，而是素养的载体</h2>
+      <p>四大领域被放在同心圆<strong>最外层</strong>——这一空间关系本身就是一种宣言。传统应试教育把学科当作终点（学数学是为了考数学）；探月的哲学恰好相反：<strong>学科是「可替换的载体」，真正沉淀下来的是通过学科历练出的心智与能力。学科会遗忘，能力会留存。</strong></p>
+    </div>
+    <div class="grid g2">
+      <div class="dcard"><div class="dnum">01</div><h3>数学与科学</h3><div class="en">Math & Science</div>
+        <p>不是需要背诵的公式与结论，而是人类理解世界的<strong>理性思维方式</strong>：如何提出可检验的问题、用证据推理、在不确定中逼近真相。强调「像科学家一样思考」，经历假设—实验—论证—修正的完整链条。</p>
+        <p style="color:var(--accent2);font-size:13px;margin-bottom:8px">↳ 回应：批判性思维 · 逻辑推理 · 量化建模</p>
+        <div class="proj"><b>项目示例</b>：用日常材料制作「水火箭」并优化飞行高度，整合力学、流体、材料与数据分析。</div></div>
+
+      <div class="dcard"><div class="dnum">02</div><h3>科创与设计</h3><div class="en">D.R.E.A.M</div>
+        <p>核心理念是「<strong>造物即学习</strong>」，以设计思维为主轴，围绕真实需求走完「共情—定义—构思—原型—测试」。缩写 D.R.E.A.M 在创新教育中常指 Design / Research / Engineering / Art / Math，是 STEAM 的本土化表达。<span class="badge b-guess">推测</span></p>
+        <p style="color:var(--accent2);font-size:13px;margin-bottom:8px">↳ 回应：社会创新 · 系统性问题解决 · 创造力</p>
+        <div class="proj"><b>项目示例</b>：为视障人士设计并 3D 打印辅助工具；为校园真实痛点开发软硬件结合方案并做用户测试。</div></div>
+
+      <div class="dcard"><div class="dnum">03</div><h3>社会与人文</h3><div class="en">Social & Humanities</div>
+        <p>帮助学生理解人与人、人与社会、人与历史的复杂关系，建立价值判断与意义感。把人文学科当作「追问」的训练场——多元解读、思辨写作、直面伦理两难，在多元价值中形成并论证自己的立场。</p>
+        <p style="color:var(--accent2);font-size:13px;margin-bottom:8px">↳ 回应：批判性阅读 · 同理心 · 伦理判断 · 公共表达</p>
+        <div class="proj"><b>项目示例</b>：以口述史方法采访一个社区群体，完成有观点的调研报告；围绕公共政策组织结构化辩论。</div></div>
+
+      <div class="dcard"><div class="dnum">04</div><h3>艺术与体育</h3><div class="en">Art & P.E</div>
+        <p>关照学生的身体、情感与审美——完整的人不可或缺、却最易被应试忽略的维度。艺术强调自我表达而非技法考级；体育强调身体素养、团队协作与抗挫力，而非单纯达标。</p>
+        <p style="color:var(--accent2);font-size:13px;margin-bottom:8px">↳ 回应：自我管理 · 情绪韧性 · 协作 · 创造性表达</p>
+        <div class="proj"><b>项目示例</b>：学生全程自组织一场主题公开演出；策划完成一次多日户外远征，在真实压力中练习协作与坚持。</div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- 7. 结语 -->
+<section id="closing">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">07 — SYNTHESIS</div>
+      <h2>由外向内的「回流」：教育真正的产物是「人」</h2>
+    </div>
+    <div class="prose">
+      <p class="lead">方向由内向外，是「设计逻辑」——从使命倒推该学什么；而学生的成长体验，则是由外向内「回流」——在学科与项目中，把知识沉淀为能力，再内化为品格与使命感。</p>
+      <p>四大领域各有侧重，却指向同一个圆心：<strong>数学与科学给予理性，科创与设计给予行动，社会与人文给予价值，艺术与体育给予身心。</strong>它们像四条不同的通道，把外部世界的养分向内输送，最终都是为了回应能力与心智的发展。</p>
+      <p>而十二项能力，也并非孤立的技能清单，而是一条完整链条：以<strong>思辨阅读</strong>看清现状、以<strong>探究</strong>发问、以<strong>使用资料</strong>求证、以<strong>分析综合</strong>提炼洞见、以<strong>方案设计</strong>做出改变、以<strong>表达</strong>影响他人；同时以<strong>身心健康、自我认知、自主学习</strong>安顿自我，以<strong>公民责任、合作引领、建立连接</strong>走向世界。它们共同被六种心智性情所驱动，共同服务于最中心那句话——</p>
+      <p class="lead" style="border-color:var(--gold);color:var(--gold)">内心丰盈的个体，积极行动的公民。学科可以更换、知识会被遗忘，但通过学科长出的人，才是教育真正的产物。</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- 8. 来源 -->
+<section id="sources">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">08 — REFERENCES</div>
+      <h2>参考来源与说明</h2>
+      <p>本报告由多路研究综合而成。<span class="badge b-fact">事实</span> 为公开报道 / 官网可确认信息；<span class="badge b-interp">阐释</span> 为基于教育学常识的合理解读；<span class="badge b-guess">推测</span> 为无直接证据的推断。同心圆四圈层的逐字命名以题图（探月官方素养模型图示）为第一手依据。</p>
+    </div>
+    <div class="srcs">
+      <a href="https://moonshotacademy.cn/en/">探月学院官网 Moonshot Academy</a>
+      <a href="https://moonshotacademy.cn/en/about_us/">官网 · About Us</a>
+      <a href="https://moonshotacademy.cn/en/curriculums/">官网 · Curriculums</a>
+      <a href="https://www.bilibili.com/video/BV1ZS7q6LENG/">硅谷101：探访北京探月学校（视频）</a>
+      <a href="https://www.huxiu.com/article/4870811.html">虎嗅：AI 时代「超级高中生」的创新教育实验</a>
+      <a href="https://36kr.com/p/1722988216321">36氪：探月学院如何实践创新教育</a>
+      <a href="https://zhuanlan.zhihu.com/p/493684371">知乎专访：探月「以评价为中心」</a>
+      <a href="https://www.thepaper.cn/newsDetail_forward_5513363">澎湃：北大附中内部有个探月学院</a>
+      <a href="https://www.163.com/dy/article/L0R8IF8C05566OCK.html">网易：对话探月校长王熙乔</a>
+      <a href="https://casel.org/casel-sel-framework-11-2020/">CASEL 社会情感学习（SEL）五大素养框架</a>
+      <a href="https://www.oecd.org/en/data/tools/oecd-learning-compass-2030.html">OECD Learning Compass 2030</a>
+      <a href="https://www.ala.org/acrl/standards/ilframework">ACRL 高等教育信息素养框架</a>
+      <a href="https://en.wikipedia.org/wiki/STEAM_education">STEAM Education（Wikipedia）</a>
+      <a href="https://ixdf.org/literature/article/5-stages-in-the-design-thinking-process">Stanford d.school 设计思维五阶段</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="disc">本报告为基于一张公开信息图的教育解读，非探月学院官方出品。部分学术框架细节与 D.R.E.A.M 缩写含义为合理推测，已在正文标注；关键事实（创办年份、创始人背景、K12 覆盖、使命表述、毕业标准、MTC 评价、「第一颗芯片」比喻）均有多源交叉印证。</p>
+    <p>图文报告 · 由图片内容结构化生成 · 2026</p>
+  </div>
+</footer>
+
+</body>
+</html>
